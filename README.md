@@ -62,9 +62,32 @@ Klasifikasi citra otomatis mengurangi pekerjaan pemilahan manual pada koleksi ga
 
 ### 3.2 Kelas
 
-Data memiliki **16 kelas** (label 0–15), sesuai dengan `num_classes = 16` pada seluruh notebook. Bukti pertama datang dari `metamodel.log`, yang mencetak `Classes: [0 1 2 ... 15]` (16 label berbeda pada `y`). Bukti kedua dari berkas probabilitas (Bagian 7.2): setiap kelas 0–15 diprediksi sekitar 1.700–2.300 kali pada 32.003 baris OOF dan sekitar 415–590 kali pada 7.994 data uji, dan massa probabilitas tersebar di seluruh 16 kolom. Sebaran yang hampir merata ini konsisten dengan dataset yang seimbang (≈ 2.000 gambar per kelas pada data latih dan ≈ 500 pada data uji). Ini **dugaan** dari pola prediksi; distribusi label asli perlu dikonfirmasi dari `train.csv`.
+Data memiliki **16 kelas** jenis dokumen (label 0–15), sesuai dengan `num_classes = 16` pada seluruh notebook.
 
-> **Koreksi dari versi README sebelumnya:** versi sebelumnya memuat pemetaan 8 kelas (`cardboard`, `electronic`, `foodwaste`, `glass`, `metal`, `paper`, `plastic`, `textile`) dan menganggap `num_classes = 16` sebagai konfigurasi berlebih. Berkas probabilitas menunjukkan bahwa ke-16 kelas benar-benar dipakai, jadi pemetaan 8 kelas tersebut tidak sesuai dengan data yang dilatih. Nama untuk label 0–15 belum diketahui dari berkas yang ada: `[isi dari kolom class_name pada train.csv]`.
+| ID | Kategori | Ciri visual dan isi tipikal |
+|---:|----------|-----------------------------|
+| 0 | advertisement | Materi promosi cetak, flyer, judul komersial tebal |
+| 1 | budget | Tabel keuangan, neraca, lembar buku besar |
+| 2 | email | Korespondensi email tercetak dengan kepala surat (To:, From:, Subject:) |
+| 3 | file_folder | Sampul indeks map, pembatas tab, lembar judul binder |
+| 4 | form | Formulir standar, kotak isian, daftar periksa, kuesioner |
+| 5 | handwritten | Surat, catatan jurnal, atau tanda tangan tulisan tangan |
+| 6 | invoice | Tagihan, kuitansi, rincian nominal keuangan |
+| 7 | letter | Surat resmi dengan alamat pengirim/penerima dan salam pembuka |
+| 8 | memo | Memorandum internal (MEMORANDUM, Date:, To:, From:) |
+| 9 | news_article | Kliping pers berkolom banyak, judul koran, keterangan foto |
+| 10 | presentation | Slide presentasi lanskap, tata letak butir horizontal |
+| 11 | questionnaire | Survei dan formulir respons berhalaman banyak |
+| 12 | resume | Curriculum vitae, lamaran kerja, bagian pengalaman terstruktur |
+| 13 | scientific_publication | Makalah jurnal terbit (tipografi padat dua kolom) |
+| 14 | scientific_report | Laporan teknis berhalaman banyak, ringkasan lab, dokumentasi |
+| 15 | specification | Skema teknik, diagram paten, spesifikasi teknis |
+
+Bukti bahwa ke-16 kelas dipakai: `metamodel.log` mencetak `Classes: [0 1 2 ... 15]`, dan pada berkas probabilitas setiap kelas diprediksi sekitar 1.700–2.300 kali pada 32.003 baris OOF serta sekitar 415–590 kali pada 7.994 data uji (Bagian 7.2). Sebaran yang hampir merata ini konsisten dengan dataset yang seimbang (≈ 2.000 gambar per kelas pada data latih dan ≈ 500 pada data uji). Ini **dugaan** dari pola prediksi; distribusi label asli perlu dikonfirmasi dari `train.csv`.
+
+> **Koreksi dari versi README sebelumnya:** versi awal memuat pemetaan 8 kelas sampah (`cardboard`, `electronic`, dst.) yang tidak sesuai dengan data ini. Pemetaan di atas menggantikannya.
+
+**Catatan pasangan kelas yang mirip.** Beberapa kelas berbagi tampilan atau struktur, sehingga lazim tertukar pada klasifikasi dokumen: `form` dan `questionnaire` (4, 11), `letter` dan `memo` dan `email` (7, 8, 2), `scientific_publication` dan `scientific_report` (13, 14), serta `handwritten` dan `file_folder` (5, 3). Ini perkiraan berdasarkan deskripsi kelas, bukan temuan dari model. Matriks konfusi diperlukan untuk memastikannya.
 
 ### 3.3 Penanganan gambar rusak
 
@@ -234,7 +257,7 @@ Akurasi per fold (fold 1–5):
 5. **Pembanding terhadap model dasar:** log loss meta-model terbaik (0,542) lebih rendah daripada loss validasi terbaik ConvNeXt pada fold 5 (0,599) dan DiT (0,787). Karena fold dan prosedur berbeda, ini hanya indikasi bahwa stacking memperbaiki kualitas probabilitas, bukan perbandingan yang ketat.
 6. **Pilihan model sederhana:** karena Logistic Regression hampir sama akurat dan jauh lebih murah serta lebih mudah dijelaskan, nilai tambah XGBoost dan penyetelan Optuna sebaiknya diuji secara hati-hati (lihat Bagian 9).
 
-**Distribusi prediksi `submission_initial.csv` (XGBoost):** 461–548 prediksi per kelas (rata-rata 499,6; simpangan baku 25,2), kelas 10 terbanyak (548) dan kelas 9 tersedikit (461). Sebagai pembanding, rata-rata sederhana ConvNeXt + DiT menghasilkan simpangan baku 35,4 (kelas 11 hanya 425 dan kelas 10 sebanyak 553). Stacking membuat sebaran lebih merata dan lebih dekat ke ≈ 500 per kelas, yang konsisten dengan dugaan data uji seimbang. Ini belum membuktikan akurasi yang lebih tinggi.
+**Distribusi prediksi `submission_initial.csv` (XGBoost):** 461–548 prediksi per kelas (rata-rata 499,6; simpangan baku 25,2), `presentation` (10) terbanyak (548) dan `news_article` (9) tersedikit (461). Sebagai pembanding, rata-rata sederhana ConvNeXt + DiT menghasilkan simpangan baku 35,4 (`questionnaire` hanya 425 dan `presentation` sebanyak 553). Stacking membuat sebaran lebih merata dan lebih dekat ke ≈ 500 per kelas, yang konsisten dengan dugaan data uji seimbang. Ini belum membuktikan akurasi yang lebih tinggi.
 
 ---
 
@@ -258,24 +281,24 @@ Prediksi uji adalah rata-rata kelima fold (tiap fold menyumbang 1/5), jadi jumla
 
 | Kelas | ConvNeXt OOF | DiT OOF | ConvNeXt uji | DiT uji |
 |------:|-------------:|--------:|-------------:|--------:|
-| 0 | 2.022 | 2.143 | 504 | 523 |
-| 1 | 1.915 | 1.947 | 476 | 478 |
-| 2 | 2.008 | 2.020 | 501 | 502 |
-| 3 | 2.092 | 2.177 | 522 | 560 |
-| 4 | 2.128 | 2.184 | 550 | 559 |
-| 5 | 2.125 | 1.969 | 525 | 487 |
-| 6 | 2.057 | 2.100 | 503 | 533 |
-| 7 | 2.122 | 2.042 | 533 | 517 |
-| 8 | 2.036 | 1.857 | 487 | 473 |
-| 9 | 1.916 | 1.988 | 479 | 487 |
-| 10 | **2.338** | 2.008 | **587** | 493 |
-| 11 | 1.845 | 1.762 | 440 | 415 |
-| 12 | 1.897 | 1.906 | 489 | 473 |
-| 13 | 1.988 | 1.989 | 500 | 497 |
-| 14 | **1.668** | 2.107 | **429** | 537 |
-| 15 | 1.846 | 1.804 | 469 | 460 |
+| 0 (advertisement) | 2.022 | 2.143 | 504 | 523 |
+| 1 (budget) | 1.915 | 1.947 | 476 | 478 |
+| 2 (email) | 2.008 | 2.020 | 501 | 502 |
+| 3 (file_folder) | 2.092 | 2.177 | 522 | 560 |
+| 4 (form) | 2.128 | 2.184 | 550 | 559 |
+| 5 (handwritten) | 2.125 | 1.969 | 525 | 487 |
+| 6 (invoice) | 2.057 | 2.100 | 503 | 533 |
+| 7 (letter) | 2.122 | 2.042 | 533 | 517 |
+| 8 (memo) | 2.036 | 1.857 | 487 | 473 |
+| 9 (news_article) | 1.916 | 1.988 | 479 | 487 |
+| 10 (presentation) | **2.338** | 2.008 | **587** | 493 |
+| 11 (questionnaire) | 1.845 | 1.762 | 440 | 415 |
+| 12 (resume) | 1.897 | 1.906 | 489 | 473 |
+| 13 (scientific_publication) | 1.988 | 1.989 | 500 | 497 |
+| 14 (scientific_report) | **1.668** | 2.107 | **429** | 537 |
+| 15 (specification) | 1.846 | 1.804 | 469 | 460 |
 
-**Interpretasi:** semua kelas dipakai oleh kedua model. Penyimpangan yang paling menonjol ada pada ConvNeXt: kelas 10 diprediksi 2.338 kali (lebih banyak dari rata-rata ≈ 2.000) dan kelas 14 hanya 1.668 kali, sedangkan DiT memprediksi kelas 14 sebanyak 2.107 kali. **Hipotesis:** ConvNeXt sering menyalahkan sebagian gambar kelas 14 sebagai kelas 10, dan DiT tidak. Ini perlu dikonfirmasi dengan matriks konfusi dari label asli. Pola serupa pada data uji (587 dan 429) menunjukkan perilaku yang sama pada data yang belum terlihat. Perbedaan seperti ini menguntungkan stacking karena meta-model dapat belajar mengoreksinya.
+**Interpretasi:** semua kelas dipakai oleh kedua model. Penyimpangan yang paling menonjol ada pada ConvNeXt: `presentation` (10) diprediksi 2.338 kali (lebih banyak dari rata-rata ≈ 2.000) dan `scientific_report` (14) hanya 1.668 kali, sedangkan DiT memprediksi `scientific_report` sebanyak 2.107 kali. **Hipotesis:** ConvNeXt mengklasifikasikan sebagian `scientific_report` sebagai `presentation`, dan DiT tidak. Hipotesis ini perlu diuji dengan matriks konfusi, dan perlu dicatat bahwa kedua kelas tampak berbeda (lanskap berbutir vs teks padat), sehingga penyebabnya bisa saja resolusi 224 × 224 yang membuat teks halaman padat terlihat seperti slide. Kedua model juga memprediksi `questionnaire` (11) lebih jarang dari rata-rata (1.845 dan 1.762), yang dapat berarti sebagian jatuh ke `form` (4). Pola serupa pada data uji (587 dan 429) menunjukkan perilaku yang sama pada data yang belum terlihat. Perbedaan seperti ini menguntungkan stacking karena meta-model dapat belajar mengoreksinya.
 
 ### 7.3 Keyakinan (*confidence*) model
 
@@ -390,11 +413,11 @@ Disusun menurut dampak terhadap kesahihan hasil:
 
 1. **Perbaiki penyimpanan model terbaik** (`deepcopy`) dan simpan OOF dari epoch terbaik (lihat 8.2).
 2. **Hitung metrik terhadap label asli** (Bagian 7.6) dari berkas `.npy` yang sudah ada dan `train.csv`, termasuk kalibrasi probabilitas (kurva keandalan dan ECE).
-3. **Laporkan matriks konfusi** untuk memeriksa hipotesis bahwa ConvNeXt menukar kelas 14 dengan kelas 10 (Bagian 7.2).
+3. **Laporkan matriks konfusi** untuk memeriksa hipotesis bahwa ConvNeXt menukar `scientific_report` (14) dengan `presentation` (10) (Bagian 7.2), serta pasangan mirip pada Bagian 3.2 seperti `form` dan `questionnaire`.
 4. **Bandingkan dengan baseline sederhana**: rata-rata probabilitas dan regresi logistik sebagai meta-model. Log sudah menunjukkan bahwa Logistic Regression (akurasi 0,8411) hampir sama dengan XGBoost (0,8418). Uji juga Logistic Regression pada *logit* (log-probabilitas) bukan probabilitas mentah, dan **hitung tuning Optuna terhadap metrik yang sama dengan metrik pembanding** agar manfaatnya terukur.
 5. **Pisahkan himpunan tuning dan evaluasi** atau gunakan CV bersarang untuk estimasi yang tidak bias.
 6. **Tambahkan augmentasi dan scheduler** (misalnya *cosine decay* dengan *warmup*) pada model dasar.
-7. **Tambahkan model dasar ketiga yang beragam**, seperti LayoutLMv3 yang sudah tersedia di kode, atau ConvNeXt/ViT pada resolusi lebih tinggi.
+7. **Tambahkan model dasar ketiga yang beragam**, seperti LayoutLMv3 yang sudah tersedia di kode, atau ConvNeXt/ViT pada resolusi lebih tinggi. Pasangan kelas yang mirip secara tata letak tetapi berbeda isi teks (`letter`/`memo`/`email`, `form`/`questionnaire`, `scientific_publication`/`scientific_report`) adalah kandidat utama yang dapat terbantu oleh model berbasis teks, dan resolusi di atas 224 × 224 membantu membaca teks pada dokumen padat.
 8. **Gunakan metrik yang sama dengan metrik kompetisi** sebagai objektif Optuna bila berbeda dari akurasi (misalnya Macro F1).
 9. **Kurangi *overfit* model dasar**: ConvNeXt mencapai optimum pada epoch 3 dan DiT pada epoch 5 sementara loss latih turun terus. Pertimbangkan *weight decay*, augmentasi, *label smoothing*, *scheduler*, dan penyimpanan bobot epoch terbaik. *Label smoothing* atau *temperature scaling* juga mengurangi keyakinan berlebih yang tampak pada Bagian 7.5.
 10. **Simpan prediksi uji per fold** (bukan hanya rata-ratanya) agar pergeseran distribusi pada Bagian 8.5 dapat didiagnosis.
