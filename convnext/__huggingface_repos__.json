@@ -1,0 +1,1 @@
+{"repos": [{"repoId": "timm/convnext_base.fb_in22k_ft_in1k", "repoType": "model", "commitHash": "67758fcbcf9f007ec7630bf8636b74a8f24e52a0", "filePaths": ["model.safetensors"]}]}

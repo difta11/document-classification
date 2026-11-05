@@ -1,0 +1,1 @@
+{"repos": [{"repoId": "microsoft/dit-base", "repoType": "model", "commitHash": "9bc15e2112d775c8e8f5a88f4bba876f50b77892", "filePaths": ["config.json", "pytorch_model.bin"]}, {"repoId": "microsoft/dit-base", "repoType": "model", "commitHash": "4e150cc640b29eadc60853c4611b93725506dc07", "filePaths": ["model.safetensors"]}]}
